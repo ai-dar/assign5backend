@@ -1,80 +1,71 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 
-// 📌 1. Создать пользователя (Register)
 exports.createUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
     
-    // Проверяем, существует ли пользователь
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: "Этот email уже зарегистрирован" });
+      return res.status(400).json({ error: "This email is already registered" });
     }
 
-    // Создаем нового пользователя
     const user = new User({ username, email, password });
     await user.save();
 
-    res.status(201).json({ message: "Пользователь создан!", user });
+    res.status(201).json({ message: "User created!", user });
   } catch (err) {
-    res.status(500).json({ error: "Ошибка при создании пользователя" });
+    res.status(500).json({ error: "Error creating user" });
   }
 };
 
-// 📌 2. Получить всех пользователей (Read)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password"); // Убираем пароли из вывода
+    const users = await User.find().select("-password"); 
     res.json(users);
   } catch (err) {
-    res.status(500).json({ error: "Ошибка загрузки пользователей" });
+    res.status(500).json({ error: "Error loading users" });
   }
 };
 
-// 📌 3. Получить одного пользователя по ID (Read)
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
-    if (!user) return res.status(404).json({ error: "Пользователь не найден" });
+    if (!user) return res.status(404).json({ error: "User not found" });
 
     res.json(user);
   } catch (err) {
-    res.status(500).json({ error: "Ошибка загрузки пользователя" });
+    res.status(500).json({ error: "Error loading user" });
   }
 };
 
-// 📌 4. Обновить пользователя (Update)
 exports.updateUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
     
-    // Обновляем данные
     let updateData = { username, email };
     
-    // Если пароль передан, хешируем его
     if (password) {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(password, salt);
     }
 
     const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
-    if (!user) return res.status(404).json({ error: "Пользователь не найден" });
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.json({ message: "Пользователь обновлен!", user });
+    res.json({ message: "User updated!", user });
   } catch (err) {
-    res.status(500).json({ error: "Ошибка обновления пользователя" });
+    res.status(500).json({ error: "Error updating user" });
   }
 };
 
-// 📌 5. Удалить пользователя (Delete)
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ error: "Пользователь не найден" });
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.json({ message: "Пользователь удален!" });
+    res.json({ message: "User deleted!" });
   } catch (err) {
-    res.status(500).json({ error: "Ошибка удаления пользователя" });
+    res.status(500).json({ error: "Error deleting user" });
   }
 };

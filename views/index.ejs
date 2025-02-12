@@ -6,19 +6,19 @@
             <li>
                 <div>
                     <strong><%= task.title %></strong>
-                    <p>🕒 Дедлайн: <%= task.deadline ? new Date(task.deadline).toLocaleString() : "Без дедлайна" %></p>
+                    <p>🕒 Deadline: <%= task.deadline ? new Date(task.deadline).toLocaleString() : "Без дедлайна" %></p>
                 </div>
                 <div>
-                    <a href="/edit/<%= task._id %>" class="btn">✏️ Редактировать</a>
+                    <a href="/edit/<%= task._id %>" class="btn">✏️ Edit</a>
                     <form action="/delete/<%= task._id %>" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">🗑 Удалить</button>
+                        <button type="submit" class="btn btn-danger">🗑 Delete</button>
                     </form>
                 </div>
             </li>
         <% }) %>
     </ul>
 <% } else { %>
-    <p>✅ У вас пока нет задач.</p>
+    <p>✅ You dont have any tasks.</p>
 <% } %>
 
-<a href="/create" class="btn">➕ Добавить задачу</a>
+<a href="/create" class="btn">➕ Add a task</a>

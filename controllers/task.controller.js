@@ -1,33 +1,30 @@
 const Task = require("../models/task.model");
 
-// 📌 1. Создать задачу (Create)
 exports.createTask = async (req, res) => {
     try {
       const { title, description, deadline } = req.body;
       
-      if (!title) return res.status(400).json({ error: "Название задачи обязательно!" });
+      if (!title) return res.status(400).json({ error: "Task title is required!" });
       
       const newTask = new Task({ title, description, deadline, user: req.user.id });
       await newTask.save();
       
-      res.status(201).json({ message: "Задача создана!", task: newTask });
+      res.status(201).json({ message: "Task created!", task: newTask });
     } catch (err) {
-      res.status(500).json({ error: "Ошибка создания задачи" });
+      res.status(500).json({ error: "Error creating task" });
     }
   };
   
 
-// 📌 2. Получить все задачи пользователя (Read)
 exports.getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({ user: req.user.id });
     res.json(tasks);
   } catch (err) {
-    res.status(500).json({ error: "Ошибка загрузки задач" });
+    res.status(500).json({ error: "Error loading tasks" });
   }
 };
 
-// 📌 3. Обновить задачу (Update)
 exports.updateTask = async (req, res) => {
   try {
     const { title, description, deadline, completed } = req.body;
@@ -36,22 +33,21 @@ exports.updateTask = async (req, res) => {
       { title, description, deadline, completed }, 
       { new: true }
     );
-    if (!task) return res.status(404).json({ error: "Задача не найдена" });
+    if (!task) return res.status(404).json({ error: "Task not found" });
 
-    res.json({ message: "Задача обновлена!", task });
+    res.json({ message: "Task updated!", task });
   } catch (err) {
-    res.status(500).json({ error: "Ошибка обновления задачи" });
+    res.status(500).json({ error: "Error updating task" });
   }
 };
 
-// 📌 4. Удалить задачу (Delete)
 exports.deleteTask = async (req, res) => {
   try {
     const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-    if (!task) return res.status(404).json({ error: "Задача не найдена" });
+    if (!task) return res.status(404).json({ error: "Task not found" });
 
-    res.json({ message: "Задача удалена!" });
+    res.json({ message: "Task deleted!" });
   } catch (err) {
-    res.status(500).json({ error: "Ошибка удаления задачи" });
+    res.status(500).json({ error: "Error deleting task" });
   }
 };

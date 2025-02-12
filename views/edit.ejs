@@ -3,9 +3,9 @@
 <form action="/edit/<%= task._id %>" method="POST">
     <input type="text" name="title" value="<%= task.title %>" required>
     <textarea name="description"><%= task.description %></textarea>
-    <label>Дедлайн:</label>
+    <label>Deadline:</label>
     <input type="datetime-local" name="deadline" value="<%= task.deadline ? new Date(task.deadline).toISOString().slice(0, -1) : '' %>">
-    <button type="submit">Сохранить</button>
+    <button type="submit">Save</button>
 </form>
 
-<a href="/" class="btn">⬅️ Назад</a>
+<a href="/" class="btn">⬅️ Back</a>

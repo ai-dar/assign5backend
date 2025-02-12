@@ -5,7 +5,7 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const Task = require("./models/task.model.js");
 const authRoutes = require("./routes/auth.routes.js");
-const bot = require("./controllers/notification.controller.js"); // Подключаем бота
+const bot = require("./controllers/notification.controller.js"); 
 
 
 const app = express();
@@ -13,12 +13,10 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("client"));
 
-// 📌 Подключение к MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("✅ Подключено к MongoDB"))
     .catch(err => console.error("❌ Ошибка подключения:", err));
 
-// 📌 Настройка сессий и flash-сообщений
 app.use(session({
     secret: "supersecretkey",
     resave: false,
@@ -33,7 +31,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// 📌 Middleware для проверки аутентификации
 const requireAuth = (req, res, next) => {
     if (!req.session.user) {
         req.flash("error_msg", "Сначала войдите в систему!");
@@ -42,7 +39,6 @@ const requireAuth = (req, res, next) => {
     next();
 };
 
-// 📌 Главная страница (Список задач)
 app.get("/", requireAuth, async (req, res) => {
     try {
         const tasks = await Task.find({ user: req.session.user._id });
@@ -62,7 +58,6 @@ app.get("/", requireAuth, async (req, res) => {
     }
 });
 
-// 📌 Форма создания задачи
 app.get("/create", requireAuth, (req, res) => {
     res.render("layout", { content: `
         <h2>➕ Добавить задачу</h2>
@@ -75,7 +70,6 @@ app.get("/create", requireAuth, (req, res) => {
         </form>` });
 });
 
-// 📌 Создание задачи (POST)
 app.post("/tasks", requireAuth, async (req, res) => {
     const { title, description, deadline } = req.body;
     await Task.create({ title, description, deadline, user: req.session.user._id });
@@ -83,14 +77,12 @@ app.post("/tasks", requireAuth, async (req, res) => {
     res.redirect("/");
 });
 
-// 📌 Удаление задачи
 app.post("/delete/:id", requireAuth, async (req, res) => {
     await Task.findOneAndDelete({ _id: req.params.id, user: req.session.user._id });
     req.flash("success_msg", "Задача удалена!");
     res.redirect("/");
 });
 
-// 📌 Страница регистрации
 app.get("/register", (req, res) => {
     res.render("layout", { content: `
         <h2>📝 Регистрация</h2>
@@ -103,7 +95,6 @@ app.get("/register", (req, res) => {
         <p>Уже есть аккаунт? <a href="/login">Войти</a></p>` });
 });
 
-// 📌 Страница входа
 app.get("/login", (req, res) => {
     res.render("layout", { content: `
         <h2>🔑 Вход</h2>
@@ -115,7 +106,6 @@ app.get("/login", (req, res) => {
         <p>Нет аккаунта? <a href="/register">Регистрация</a></p>` });
 });
 
-// 📌 Форма редактирования задачи (GET)
 app.get("/edit/:id", requireAuth, async (req, res) => {
     try {
         const task = await Task.findOne({ _id: req.params.id, user: req.session.user._id });
@@ -139,7 +129,6 @@ app.get("/edit/:id", requireAuth, async (req, res) => {
     }
 });
 
-// 📌 Обновление задачи (POST)
 app.post("/edit/:id", requireAuth, async (req, res) => {
     try {
         const { title, description, deadline } = req.body;
@@ -157,9 +146,7 @@ app.post("/edit/:id", requireAuth, async (req, res) => {
 });
 
 
-// 📌 Подключаем маршруты авторизации
 app.use(authRoutes);
 
-// 📌 Запуск сервера
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Сервер запущен на http://localhost:${PORT}`));

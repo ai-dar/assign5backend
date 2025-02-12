@@ -2,11 +2,10 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
 
-// 📌 CRUD маршруты для пользователей
-router.post("/", userController.createUser); // Создать пользователя (регистрация)
-router.get("/", userController.getAllUsers); // Получить всех пользователей
-router.get("/:id", userController.getUserById); // Получить пользователя по ID
-router.put("/:id", userController.updateUser); // Обновить пользователя
-router.delete("/:id", userController.deleteUser); // Удалить пользователя
+router.post("/", userController.createUser); 
+router.get("/", userController.getAllUsers); 
+router.get("/:id", userController.getUserById);
+router.put("/:id", userController.updateUser); 
+router.delete("/:id", userController.deleteUser);
 
 module.exports = router;
