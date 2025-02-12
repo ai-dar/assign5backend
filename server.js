@@ -42,44 +42,44 @@ const requireAuth = (req, res, next) => {
 app.get("/", requireAuth, async (req, res) => {
     try {
         const tasks = await Task.find({ user: req.session.user._id });
-        res.render("layout", { content: `<h2>📌 Мои задачи</h2>
+        res.render("layout", { content: `<h2>📌 My tasks</h2>
             <ul>${tasks.map(task => `
                 <li>
-                    <strong>${task.title}</strong> - ${task.deadline ? new Date(task.deadline).toLocaleString() : "Без дедлайна"}
+                    <strong>${task.title}</strong> - ${task.deadline ? new Date(task.deadline).toLocaleString() : "No deadline"}
                     <a href="/edit/${task._id}">✏️</a>
                     <form action="/delete/${task._id}" method="POST" style="display:inline;">
-                        <button type="submit">🗑 Удалить</button>
+                        <button type="submit">🗑 Delete</button>
                     </form>
                 </li>`).join('')}
             </ul>
-            <a href="/create">➕ Добавить задачу</a>` });
+            <a href="/create">➕ Add task</a>` });
     } catch (err) {
-        res.status(500).send("Ошибка загрузки задач");
+        res.status(500).send("Error to load tasks");
     }
 });
 
 app.get("/create", requireAuth, (req, res) => {
     res.render("layout", { content: `
-        <h2>➕ Добавить задачу</h2>
+        <h2>➕ Add task</h2>
         <form action="/tasks" method="POST">
-            <input type="text" name="title" placeholder="Название задачи" required>
-            <textarea name="description" placeholder="Описание"></textarea>
-            <label>Дедлайн:</label>
+            <input type="text" name="title" placeholder="Name of task" required>
+            <textarea name="description" placeholder="Description"></textarea>
+            <label>Deadline:</label>
             <input type="datetime-local" name="deadline">
-            <button type="submit">Создать</button>
+            <button type="submit">Create</button>
         </form>` });
 });
 
 app.post("/tasks", requireAuth, async (req, res) => {
     const { title, description, deadline } = req.body;
     await Task.create({ title, description, deadline, user: req.session.user._id });
-    req.flash("success_msg", "Задача успешно создана!");
+    req.flash("success_msg", "Task created successfully!");
     res.redirect("/");
 });
 
 app.post("/delete/:id", requireAuth, async (req, res) => {
     await Task.findOneAndDelete({ _id: req.params.id, user: req.session.user._id });
-    req.flash("success_msg", "Задача удалена!");
+    req.flash("success_msg", "Task deleted!");
     res.redirect("/");
 });
 
@@ -87,45 +87,45 @@ app.get("/register", (req, res) => {
     res.render("layout", { content: `
         <h2>📝 Регистрация</h2>
         <form action="/register" method="POST">
-            <input type="text" name="username" placeholder="Имя пользователя" required>
+            <input type="text" name="username" placeholder="Username" required>
             <input type="email" name="email" placeholder="Email" required>
-            <input type="password" name="password" placeholder="Пароль" required>
-            <button type="submit">Зарегистрироваться</button>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Register</button>
         </form>
-        <p>Уже есть аккаунт? <a href="/login">Войти</a></p>` });
+        <p>Already have an account? <a href="/login">Login</a></p>` });
 });
 
 app.get("/login", (req, res) => {
     res.render("layout", { content: `
-        <h2>🔑 Вход</h2>
+        <h2>🔑 Login</h2>
         <form action="/login" method="POST">
             <input type="email" name="email" placeholder="Email" required>
-            <input type="password" name="password" placeholder="Пароль" required>
-            <button type="submit">Войти</button>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
         </form>
-        <p>Нет аккаунта? <a href="/register">Регистрация</a></p>` });
+        <p>Нет аккаунта? <a href="/register">Register</a></p>` });
 });
 
 app.get("/edit/:id", requireAuth, async (req, res) => {
     try {
         const task = await Task.findOne({ _id: req.params.id, user: req.session.user._id });
         if (!task) {
-            req.flash("error_msg", "Задача не найдена!");
+            req.flash("error_msg", "Task not found!");
             return res.redirect("/");
         }
 
         res.render("layout", { content: `
-            <h2>✏️ Редактировать задачу</h2>
+            <h2>✏️ Edit task</h2>
             <form action="/edit/${task._id}" method="POST">
                 <input type="text" name="title" value="${task.title}" required>
                 <textarea name="description">${task.description}</textarea>
                 <label>Дедлайн:</label>
                 <input type="datetime-local" name="deadline" value="${new Date(task.deadline).toISOString().slice(0, -1)}">
-                <button type="submit">Сохранить</button>
+                <button type="submit">Save</button>
             </form>
         ` });
     } catch (err) {
-        res.status(500).send("Ошибка загрузки задачи.");
+        res.status(500).send("Error to load tasks.");
     }
 });
 
@@ -138,10 +138,10 @@ app.post("/edit/:id", requireAuth, async (req, res) => {
             { new: true }
         );
 
-        req.flash("success_msg", "Задача обновлена!");
+        req.flash("success_msg", "The task has been updated!");
         res.redirect("/");
     } catch (err) {
-        res.status(500).send("Ошибка обновления задачи.");
+        res.status(500).send("Error updating task.");
     }
 });
 
